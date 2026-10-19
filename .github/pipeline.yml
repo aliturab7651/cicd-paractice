@@ -1,4 +1,4 @@
-name: Deploy
+name: Pipeline
 
 on:
   push:
@@ -10,7 +10,21 @@ permissions:
   id-token: write
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: index.html check karo
+        run: test -f index.html && echo "index.html mojood hai"
+
+      - name: HTML validate karo
+        run: |
+          npm install -g htmlhint
+          htmlhint "**/*.html"
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     environment:
       name: github-pages
