@@ -16,3 +16,8 @@ jobs:
 
       - name: index.html check karo
         run: test -f index.html && echo "index.html mojood hai"
+
+      - name: HTML validate karo
+        run: |
+          npm install -g htmlhint
+          htmlhint "**/*.html"
