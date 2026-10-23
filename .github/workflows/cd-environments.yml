@@ -1,0 +1,27 @@
+name: CD Environments
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Tests pass ho gaye"
+
+  deploy-staging:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - run: echo "STAGING pe deploy ho raha hai"
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: echo "PRODUCTION pe deploy ho raha hai"
