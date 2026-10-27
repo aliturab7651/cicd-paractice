@@ -1,0 +1,38 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Kaunsa image tag wapas lagana hai (jaise sha-a1b2c3d)"
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image ka naam banayein
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Check karein ke image maujood hai
+        run: docker manifest inspect $IMAGE:$VERSION
+
+      - name: Production tag ko purani image pe lagayein
+        run: docker buildx imagetools create -t $IMAGE:production $IMAGE:$VERSION
+
+      - name: Result
+        run: echo "Rollback ho gaya, production ab $VERSION pe hai"
